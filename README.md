@@ -2,15 +2,6 @@
 
 Project to run and test fragment shaders
 
-## Getting Started
+### Fire shader - mask and fullscreen variants
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+<img src="https://github.com/lesleysin/flutter_frag_shaders/blob/main/images/fire_mask.png" width=30% height=40%> <img src="https://github.com/lesleysin/flutter_frag_shaders/blob/main/images/fire_fullscreen.png" width=30% height=40%> 
