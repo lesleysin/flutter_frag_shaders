@@ -1,6 +1,8 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:shader_runner/renderer.dart';
 
 late FragmentProgram program;
 
@@ -49,48 +51,40 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final shaderLoader = ShaderLoader("shaders/cardioid.frag");
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.greenAccent,
       body: Center(
         child: Stack(
           children: <Widget>[
             SizedBox(
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
-              child: FutureBuilder<FragmentShader>(
-                  future: _load(),
+              child: FutureBuilder<ShaderLoader>(
+                  future: shaderLoader.initShader(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
-                      final shader = snapshot.data!;
+                      final loader = snapshot.data!;
                       _startTime = DateTime.now().millisecondsSinceEpoch;
-                      // shader.setFloat(0, MediaQuery.of(context).size.width);
-                      // shader.setFloat(1, MediaQuery.of(context).size.height);
+                      loader.setVec2Uniform(
+                        "uResolution",
+                        MediaQuery.of(context).size.width,
+                        MediaQuery.of(context).size.height,
+                      );
+                      loader.setVec3UniformFromColor("uColor", Colors.blueAccent);
                       return AnimatedBuilder(
                           animation: _controller,
                           builder: (context, snapshot) {
-                            // shader.setFloat(2, _elapsedTimeInSeconds);
-                            // return CustomPaint(
-                            //   size: Size(MediaQuery.of(context).size.width,
-                            //       MediaQuery.of(context).size.height),
-                            //   painter: ShaderPainter(shader),
-                            // );
-                            shader.setFloat(2, _elapsedTimeInSeconds);
-                            return Center(
-                              child: ShaderMask(
-                                shaderCallback: (rect) {
-                                  shader.setFloat(0, rect.width);
-                                  shader.setFloat(1, rect.height * 1.5);
-                                  return shader;
-                                },
-                                blendMode: BlendMode.srcIn,
-                                child: const Text(
-                                  "BURN THEM",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 112,
-                                  ),
-                                ),
+                            loader.setFloatUniform(
+                              "uTime",
+                              _elapsedTimeInSeconds,
+                            );
+                            return CustomPaint(
+                              size: Size(
+                                MediaQuery.of(context).size.width,
+                                MediaQuery.of(context).size.height,
                               ),
+                              painter: ShaderPainter(loader.shader),
                             );
                           });
                     } else {
@@ -125,6 +119,7 @@ class ShaderPainter extends CustomPainter {
 }
 
 Future<FragmentShader> _load() async {
-  FragmentProgram program = await FragmentProgram.fromAsset('shaders/fire.frag');
+  FragmentProgram program =
+      await FragmentProgram.fromAsset('shaders/cardioid.frag');
   return program.fragmentShader();
 }
